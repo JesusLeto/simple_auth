@@ -1,11 +1,12 @@
 import {UserDtoInterface} from "../../dtoUser/definition";
 import jwt from "jsonwebtoken"
 import {deleteRefreshToken, getUserByRefreshToken, saveRefreshToken} from "./queries";
+import {ApiError} from "../../error";
 
 class TokenService {
 
-    accessToken: string = ""
-    refreshToken: string = ""
+    accessToken = ""
+    refreshToken = ""
 
     async generateTokens(params: UserDtoInterface) {
         // @ts-ignore
@@ -24,13 +25,13 @@ class TokenService {
        const user =  await getUserByRefreshToken(refreshToken);
        // @ts-ignore
        const checkRefreshToken = jwt.verify(refreshToken, process.env.REFRESH_SECRET_KEY);
-       if (!user || !checkRefreshToken) throw new Error("Not authorized");
+       if (!user || !checkRefreshToken) throw ApiError.Unauthorized();
        return await this.generateTokens({email: user.email, isActivate: user.isActivate})
     }
 
     async deleteRefreshToken(refreshToken: string) {
         const resultDelete = await deleteRefreshToken(refreshToken)
-        if (!resultDelete) throw new Error("Wrong token");
+        if (!resultDelete) throw ApiError.BadRequest("Token error");
         return null
     }
 }

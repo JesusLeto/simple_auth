@@ -16,9 +16,8 @@ class UserController {
         try {
             tokens = await AuthService.login(req.body)
             res.cookie("refresh_token", tokens.refreshToken, {maxAge: 60 * 24 * 60 * 60 * 1000, httpOnly: true})
-        } catch (e) {
-            // @ts-ignore
-            return next(e.message)
+        } catch (error) {
+            return next(error)
         }
         return res.status(200).send({accessToken: tokens.accessToken})
     }
@@ -34,9 +33,8 @@ class UserController {
         try {
             result = await AuthService.register(req.body)
             res.cookie("refresh_token", result.refreshToken, {maxAge: 60 * 24 * 60 * 60 * 1000, httpOnly: true})
-        } catch (e) {
-            // @ts-ignore
-            return next(e.message)
+        } catch (error) {
+            return next(error)
         }
         return res.status(200).send(result)
     }
@@ -45,9 +43,8 @@ class UserController {
         const {refresh_token} = req.cookies
         try {
             await TokenService.deleteRefreshToken(refresh_token)
-        } catch (e) {
-            // @ts-ignore
-            return next(e.message)
+        } catch (error) {
+            return next(error)
         }
         return res.status(200).send(JSON.stringify(null))
     }
@@ -61,9 +58,8 @@ class UserController {
         try {
             result = await TokenService.refresh(refresh_token)
             res.cookie("refresh_token", result.refreshToken, {maxAge: 60 * 24 * 60 * 60 * 1000, httpOnly: true})
-        } catch (e) {
-            // @ts-ignore
-            return next("Not authorized")
+        } catch (error) {
+            return next(error)
         }
         return res.status(200).send({accessToken: result.accessToken})
     }
